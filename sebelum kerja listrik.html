@@ -1,0 +1,4041 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>VR Safety Training - Elektrik LOTO</title>
+
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+}
+
+#info{
+    position:fixed;
+    top:15px;
+    left:15px;
+    z-index:9999;
+    background:rgba(0,0,0,0.9);
+    color:white;
+    padding:15px 20px;
+    border-radius:8px;
+    font-size:50px;
+    line-height:1.5;
+    min-width:450px;
+}
+
+#training{
+    position:fixed;
+    top:15px;
+    right:15px;
+    z-index:9999;
+    background:rgba(0,0,0,0.9);
+    color:white;
+    padding:15px 20px;
+    border-radius:8px;
+    font-size:42px;
+    width:690px;
+    line-height:1.6;
+}
+
+#trainingControl{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    z-index:9999;
+    display:flex;
+    gap:15px;
+}
+
+#startTraining{
+    padding:15px 25px;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:50px;
+    cursor:pointer;
+}
+
+#resetTraining{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    z-index:9999;
+    padding:15px 25px;
+    background:#1565c0;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:50px;
+    cursor:pointer;
+}
+
+#startTraining:disabled{
+    background:#555;
+    cursor:not-allowed;
+}
+
+#timer{
+    color:#00e5ff;
+}
+
+#score{
+    color:#76ff03;
+}
+
+#errorCount{
+    color:#ff5252;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- ================================================= -->
+<!-- DESKTOP INFO -->
+<!-- ================================================= -->
+
+<div id="info">
+
+<b>VR SAFETY TRAINING ELEKTRIK</b>
+
+<br>
+
+Status:
+<span id="mainStatus">READY</span>
+
+<br>
+
+Waktu:
+<span id="timer">00:00</span>
+
+<br>
+
+Skor:
+<span id="score">100</span>/100
+
+<br>
+
+Error:
+<span id="errorCount">0</span>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- DESKTOP TRAINING -->
+<!-- ================================================= -->
+
+<div id="training">
+
+<b>CHECKLIST PEKERJAAN</b>
+
+<hr>
+
+<div id="step1">⬜ PAKAI HELMET</div>
+<div id="step2">⬜ PAKAI SAFETY SHOES</div>
+<div id="step3">⬜ PAKAI RUBBER GLOVES</div>
+<div id="step4">⬜ START MACHINE</div>
+<div id="step5">⬜ STOP MACHINE</div>
+<div id="step6">⬜ EMERGENCY STOP</div>
+<div id="step7">⬜ BREAKER OFF</div>
+<div id="step8">⬜ AMBIL LOCK</div>
+<div id="step9">⬜ PASANG LOCK</div>
+<div id="step10">⬜ AMBIL TAG</div>
+<div id="step11">⬜ PASANG TAG</div>
+<div id="step12">⬜ LOTO ACTIVE</div>
+<div id="step13">⬜ TEST POWER OFF</div>
+<div id="step14">⬜ ZERO ENERGY VERIFIED</div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- DESKTOP START -->
+<!-- ================================================= -->
+
+<div id="trainingControl">
+
+<button id="startTraining">
+START TRAINING
+</button>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- DESKTOP RESET -->
+<!-- ================================================= -->
+
+<button id="resetTraining">
+RESET TRAINING
+</button>
+
+
+<!-- ================================================= -->
+<!-- SCENE -->
+<!-- ================================================= -->
+
+<a-scene
+    id="scene"
+    background="color:#20252b"
+    renderer="antialias:true"
+    vr-mode-ui="enabled:true">
+
+
+<!-- ================================================= -->
+<!-- CAMERA -->
+<!-- ================================================= -->
+
+<a-camera
+    id="camera"
+    position="2.5 3.0 9"
+    rotation="0 0 0"
+    look-controls="enabled:true"
+    wasd-controls="enabled:false"
+    fov="55"
+    cursor="rayOrigin:mouse"
+    raycaster="objects:.clickable; far:50">
+
+
+    <!-- ================================================= -->
+    <!-- VR HUD - KANAN BAWAH -->
+    <!-- ================================================= -->
+
+    <a-entity
+        id="vrHUD"
+        position="1.35 -0.85 -2.8"
+        rotation="0 0 0"
+        scale="0.58 0.58 0.58"
+        visible="false">
+
+
+        <!-- PANEL -->
+
+        <a-plane
+            width="2.8"
+            height="2.6"
+            color="#050505"
+            opacity="0.88">
+        </a-plane>
+
+
+        <!-- TITLE -->
+
+        <a-text
+            value="LOTO SAFETY TRAINING"
+            align="center"
+            position="0 1.05 0.02"
+            color="#00e5ff"
+            width="4.2">
+        </a-text>
+
+
+        <!-- STATUS -->
+
+        <a-text
+            id="vrStatus"
+            value="STATUS : READY"
+            align="center"
+            position="0 0.75 0.02"
+            color="#ffffff"
+            width="3">
+        </a-text>
+
+
+        <!-- SCORE -->
+
+        <a-text
+            id="vrScore"
+            value="SCORE : 100"
+            align="center"
+            position="-0.65 0.45 0.02"
+            color="#76ff03"
+            width="2">
+        </a-text>
+
+
+        <!-- TIMER -->
+
+        <a-text
+            id="vrTimer"
+            value="TIME : 00:00"
+            align="center"
+            position="0.65 0.45 0.02"
+            color="#00e5ff"
+            width="2">
+        </a-text>
+
+
+        <!-- ERROR -->
+
+        <a-text
+            id="vrError"
+            value="ERROR : 0"
+            align="center"
+            position="0 0.20 0.02"
+            color="#ff5252"
+            width="2">
+        </a-text>
+
+
+        <!-- CURRENT STEP -->
+
+        <a-text
+            id="vrCurrentStep"
+            value="STEP 1 : PAKAI HELMET"
+            align="center"
+            position="0 -0.10 0.02"
+            color="#ffff00"
+            width="2.8">
+        </a-text>
+
+
+        <!-- START BUTTON -->
+
+        <a-box
+            id="vrStartTraining"
+            class="clickable"
+            position="-0.72 -0.62 0.08"
+            width="1.15"
+            height="0.42"
+            depth="0.12"
+            color="#2e7d32">
+        </a-box>
+
+        <a-text
+            value="START"
+            align="center"
+            position="-0.72 -0.62 0.16"
+            color="white"
+            width="2.2">
+        </a-text>
+
+
+        <!-- RESET BUTTON -->
+
+        <a-box
+            id="vrResetTraining"
+            class="clickable"
+            position="0.72 -0.62 0.08"
+            width="1.15"
+            height="0.42"
+            depth="0.12"
+            color="#1565c0">
+        </a-box>
+
+        <a-text
+            value="RESET"
+            align="center"
+            position="0.72 -0.62 0.16"
+            color="white"
+            width="2.2">
+        </a-text>
+
+
+        <!-- CONTROLLER INFO -->
+
+        <a-text
+            value="LASER + TRIGGER"
+            align="center"
+            position="0 -1.02 0.02"
+            color="#ffffff"
+            width="2.8">
+        </a-text>
+
+
+    </a-entity>
+
+</a-camera>
+
+
+<!-- ================================================= -->
+<!-- VR CONTROLLER LEFT -->
+<!-- ================================================= -->
+
+<a-entity
+    id="leftController"
+    laser-controls="hand:left"
+    raycaster="objects:.clickable; far:50"
+    vr-trigger>
+</a-entity>
+
+
+<!-- ================================================= -->
+<!-- VR CONTROLLER RIGHT -->
+<!-- ================================================= -->
+
+<a-entity
+    id="rightController"
+    laser-controls="hand:right"
+    raycaster="objects:.clickable; far:50"
+    vr-trigger>
+</a-entity>
+
+
+<!-- ================================================= -->
+<!-- LIGHT -->
+<!-- ================================================= -->
+
+<a-light
+    type="ambient"
+    intensity="1.0">
+</a-light>
+
+<a-light
+    type="directional"
+    position="2 8 8"
+    intensity="1.5">
+</a-light>
+
+<a-light
+    type="point"
+    position="5 5 3"
+    intensity="1.5">
+</a-light>
+
+
+<!-- ================================================= -->
+<!-- FLOOR -->
+<!-- ================================================= -->
+
+<a-plane
+    rotation="-90 0 0"
+    width="30"
+    height="25"
+    color="#555">
+</a-plane>
+
+
+<!-- ================================================= -->
+<!-- MACHINE -->
+<!-- ================================================= -->
+
+<a-box
+    position="-3.5 0.2 -3"
+    width="6"
+    height="0.4"
+    depth="3"
+    color="#333">
+</a-box>
+
+
+<a-box
+    position="-6.0 2 -3"
+    width="0.3"
+    height="4"
+    depth="0.3"
+    color="#777">
+</a-box>
+
+<a-box
+    position="-1.0 2 -3"
+    width="0.3"
+    height="4"
+    depth="0.3"
+    color="#777">
+</a-box>
+
+<a-box
+    position="-3.5 3.8 -3"
+    width="5.3"
+    height="0.3"
+    depth="0.3"
+    color="#777">
+</a-box>
+
+
+<!-- ================================================= -->
+<!-- ROLLER -->
+<!-- ================================================= -->
+
+<a-cylinder
+    id="roller"
+    position="-3.5 1.2 -3"
+    rotation="0 0 90"
+    radius="0.6"
+    height="5"
+    color="#888">
+</a-cylinder>
+
+
+<!-- ================================================= -->
+<!-- PLATE -->
+<!-- ================================================= -->
+
+<a-box
+    position="-3.5 1.85 -3"
+    width="4.5"
+    height="0.08"
+    depth="1.2"
+    color="#ccc">
+</a-box>
+
+
+<!-- ================================================= -->
+<!-- MOTOR -->
+<!-- ================================================= -->
+
+<a-box
+    position="-5.0 1.1 -3"
+    width="1.2"
+    height="1.2"
+    depth="1.2"
+    color="#263238">
+</a-box>
+
+<a-text
+    value="MOTOR"
+    position="-5.5 1.9 -2.3"
+    color="white"
+    width="2">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- MACHINE TITLE -->
+<!-- ================================================= -->
+
+<a-text
+    value="PRODUCTION MACHINE"
+    position="-5.4 4.5 -3"
+    color="white"
+    width="10">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- CONTROL PANEL -->
+<!-- ================================================= -->
+
+<a-box
+    position="0 2 -3"
+    width="1.8"
+    height="4"
+    depth="0.5"
+    color="#263238">
+</a-box>
+
+
+<a-box
+    position="0 3.35 -2.70"
+    width="1.35"
+    height="0.55"
+    depth="0.05"
+    color="#111">
+</a-box>
+
+<a-text
+    id="statusText"
+    value="STOP"
+    position="-0.43 3.23 -2.63"
+    color="red"
+    width="5">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- START -->
+<!-- ================================================= -->
+
+<a-entity
+    id="startButton"
+    class="clickable"
+    gltf-model="url(models/PB_Hijau.glb)"
+    position="-0.3 2.45 -2.35"
+    rotation="0 0 0"
+    scale="0.02 0.02 0.02">
+</a-entity>
+
+<a-text
+    value="START"
+    position="-0.72 2.00 -2.30"
+    color="white"
+    width="5">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- STOP -->
+<!-- ================================================= -->
+
+<a-cylinder
+    id="stopButton"
+    class="clickable"
+    position="0.35 2.45 -2.35"
+    rotation="90 0 0"
+    radius="0.28"
+    height="0.15"
+    color="red">
+</a-cylinder>
+
+<a-text
+    value="STOP"
+    position="0.12 2.00 -2.30"
+    color="white"
+    width="5">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- EMERGENCY -->
+<!-- ================================================= -->
+
+<a-entity
+    id="emergencyButton"
+    class="clickable"
+    gltf-model="url(models/EmergencyStop.glb)"
+    position="0 1.45 -2.35"
+    rotation="90 10 0"
+    scale="0.36 0.36 0.36">
+</a-entity>
+
+<a-text
+    value="EMERGENCY STOP"
+    position="-0.62 1.00 -2.30"
+    color="yellow"
+    width="4">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- ELECTRICAL PANEL -->
+<!-- ================================================= -->
+
+<a-box
+    position="4.2 2.3 -3"
+    width="2.5"
+    height="4.5"
+    depth="0.5"
+    color="#455A64">
+</a-box>
+
+<a-box
+    position="4.2 2.3 -2.70"
+    width="2.1"
+    height="4.1"
+    depth="0.05"
+    color="#607D8B">
+</a-box>
+
+<a-text
+    value="ELECTRICAL PANEL"
+    position="3.25 4.15 -2.62"
+    color="black"
+    width="5">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- MAIN BREAKER AREA -->
+<!-- ================================================= -->
+
+<a-box
+    position="4.2 2.65 -2.55"
+    width="1.45"
+    height="1.9"
+    depth="0.14"
+    color="#111">
+</a-box>
+
+<a-box
+    position="4.2 2.65 -2.45"
+    width="1.05"
+    height="1.55"
+    depth="0.08"
+    color="#222">
+</a-box>
+
+
+<!-- ================================================= -->
+<!-- MAIN BREAKER -->
+<!-- ================================================= -->
+
+<a-box
+    id="breaker"
+    class="clickable"
+    position="4.2 2.75 -2.30"
+    width="0.65"
+    height="1.05"
+    depth="0.22"
+    color="#d50000">
+</a-box>
+
+
+<a-box
+    id="breakerHandle"
+    position="4.2 2.95 -2.10"
+    width="0.28"
+    height="0.60"
+    depth="0.18"
+    color="#eeeeee">
+</a-box>
+
+<a-box
+    position="4.2 2.95 -1.98"
+    width="0.12"
+    height="0.35"
+    depth="0.10"
+    color="#111">
+</a-box>
+
+
+<a-text
+    value="ON"
+    position="4.52 3.05 -2.05"
+    color="lime"
+    width="5">
+</a-text>
+
+<a-text
+    value="OFF"
+    position="4.52 2.35 -2.05"
+    color="red"
+    width="5">
+</a-text>
+
+
+<a-text
+    id="breakerText"
+    value="ON"
+    position="3.88 2.00 -2.35"
+    color="lime"
+    width="5">
+</a-text>
+
+
+<a-text
+    value="MAIN BREAKER"
+    position="3.35 3.85 -2.35"
+    color="black"
+    width="5">
+</a-text>
+
+
+<!-- POWER LAMP -->
+
+<a-sphere
+    id="powerLamp"
+    position="5.15 3.35 -2.35"
+    radius="0.18"
+    color="lime">
+</a-sphere>
+
+<a-text
+    id="powerText"
+    value="POWER ON"
+    position="4.72 3.05 -2.35"
+    color="lime"
+    width="1.2">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- LOCK TARGET -->
+<!-- ================================================= -->
+
+<a-box
+    id="lockTarget"
+    class="clickable"
+    position="4.2 1.55 -2.25"
+    width="0.80"
+    height="0.75"
+    depth="0.18"
+    color="#777">
+</a-box>
+
+<a-text
+    value="LOCK HERE"
+    position="3.65 1.05 -2.20"
+    color="black"
+    width="4">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- TAG TARGET -->
+<!-- ================================================= -->
+
+<a-box
+    id="tagTarget"
+    class="clickable"
+    position="5.15 1.55 -2.25"
+    width="0.80"
+    height="0.75"
+    depth="0.18"
+    color="#777">
+</a-box>
+
+<a-text
+    value="TAG HERE"
+    position="4.72 1.05 -2.20"
+    color="black"
+    width="4">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- LOTO STATION -->
+<!-- ================================================= -->
+
+<a-box
+    position="7.5 2.3 -3"
+    width="2.4"
+    height="4.5"
+    depth="0.5"
+    color="#263238">
+</a-box>
+
+<a-text
+    value="LOTO STATION"
+    position="6.55 4.15 -2.65"
+    color="black"
+    width="5">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- LOTO LOCK -->
+<!-- ================================================= -->
+
+<a-torus
+    id="lotoLock"
+    class="clickable"
+    position="6.75 2.9 -2.50"
+    rotation="90 0 0"
+    radius="0.38"
+    radius-tubular="0.11"
+    color="red">
+</a-torus>
+
+<a-box
+    id="lockBody"
+    position="6.75 2.45 -2.50"
+    width="0.7"
+    height="0.55"
+    depth="0.18"
+    color="red">
+</a-box>
+
+<a-text
+    value="LOTO LOCK"
+    position="6.2 1.90 -2.50"
+    color="white"
+    width="3">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- LOTO TAG -->
+<!-- ================================================= -->
+
+<a-box
+    id="lotoTag"
+    class="clickable"
+    position="7.75 2.75 -2.50"
+    width="0.75"
+    height="1.15"
+    depth="0.10"
+    color="yellow">
+</a-box>
+
+<a-text
+    value="DANGER"
+    position="7.42 2.88 -2.43"
+    color="red"
+    width="3">
+</a-text>
+
+<a-text
+    value="DO NOT OPERATE"
+    position="7.25 2.58 -2.43"
+    color="red"
+    width="2">
+</a-text>
+
+<a-text
+    value="LOTO TAG"
+    position="7.25 1.90 -2.50"
+    color="white"
+    width="3">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- PPE & TOOL STATION -->
+<!-- ================================================= -->
+
+<a-box
+    position="10.0 2.3 -3"
+    width="4.2"
+    height="4.5"
+    depth="0.5"
+    color="#263238">
+</a-box>
+
+<a-text
+    value="PPE & TOOLS"
+    position="8.65 4.15 -2.65"
+    color="yellow"
+    width="5">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- HELMET -->
+<!-- ================================================= -->
+
+<a-sphere
+    id="helmet"
+    class="clickable"
+    position="8.9 3.0 -2.35"
+    radius="0.55"
+    scale="1 0.65 1"
+    color="yellow">
+</a-sphere>
+
+<a-box
+    id="helmetBottom"
+    position="8.9 2.72 -2.35"
+    width="1.15"
+    height="0.12"
+    depth="0.85"
+    color="yellow">
+</a-box>
+
+<a-box
+    position="8.9 2.62 -2.05"
+    width="0.75"
+    height="0.10"
+    depth="0.25"
+    color="#222">
+</a-box>
+
+<a-text
+    value="HELMET"
+    position="8.42 1.95 -2.45"
+    color="white"
+    width="3">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- SAFETY SHOES -->
+<!-- ================================================= -->
+
+<a-box
+    id="safetyShoe1"
+    class="clickable"
+    position="10.05 1.05 -2.45"
+    width="0.95"
+    height="0.35"
+    depth="1.35"
+    color="black">
+</a-box>
+
+<a-box
+    position="10.05 1.22 -1.90"
+    width="0.75"
+    height="0.35"
+    depth="0.65"
+    color="black">
+</a-box>
+
+<a-box
+    id="safetyShoe2"
+    class="clickable"
+    position="11.05 1.05 -2.45"
+    width="0.95"
+    height="0.35"
+    depth="1.35"
+    color="black">
+</a-box>
+
+<a-box
+    position="11.05 1.22 -1.90"
+    width="0.75"
+    height="0.35"
+    depth="0.65"
+    color="black">
+</a-box>
+
+<a-box
+    position="10.05 1.05 -3.0"
+    width="0.8"
+    height="0.35"
+    depth="0.2"
+    color="#777">
+</a-box>
+
+<a-box
+    position="11.05 1.05 -3.0"
+    width="0.8"
+    height="0.35"
+    depth="0.2"
+    color="#777">
+</a-box>
+
+<a-text
+    value="SAFETY SHOES"
+    position="9.55 0.55 -2.5"
+    color="white"
+    width="4">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- RUBBER GLOVES -->
+<!-- ================================================= -->
+
+<a-sphere
+    id="gloveLeft"
+    class="clickable"
+    position="9.0 1.7 -1.95"
+    radius="0.30"
+    scale="0.75 1.3 0.55"
+    color="#1976d2">
+</a-sphere>
+
+<a-sphere
+    id="gloveRight"
+    class="clickable"
+    position="9.65 1.7 -1.95"
+    radius="0.30"
+    scale="0.75 1.3 0.55"
+    color="#1976d2">
+</a-sphere>
+
+<a-cylinder
+    position="8.88 1.98 -1.95"
+    radius="0.07"
+    height="0.28"
+    color="#1976d2">
+</a-cylinder>
+
+<a-cylinder
+    position="9.08 2.00 -1.95"
+    radius="0.07"
+    height="0.30"
+    color="#1976d2">
+</a-cylinder>
+
+<a-cylinder
+    position="9.55 1.98 -1.95"
+    radius="0.07"
+    height="0.28"
+    color="#1976d2">
+</a-cylinder>
+
+<a-cylinder
+    position="9.75 2.00 -1.95"
+    radius="0.07"
+    height="0.30"
+    color="#1976d2">
+</a-cylinder>
+
+<a-text
+    value="RUBBER GLOVES"
+    position="8.55 1.15 -2.0"
+    color="white"
+    width="4">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- MULTIMETER -->
+<!-- ================================================= -->
+
+<a-box
+    id="multimeter"
+    class="clickable"
+    position="10.55 3.25 -2.25"
+    width="0.9"
+    height="1.15"
+    depth="0.25"
+    color="#202020">
+</a-box>
+
+<a-box
+    position="10.55 3.65 -2.10"
+    width="0.65"
+    height="0.35"
+    depth="0.05"
+    color="#263238">
+</a-box>
+
+<a-box
+    position="10.55 3.65 -2.04"
+    width="0.50"
+    height="0.20"
+    depth="0.03"
+    color="#9ccc65">
+</a-box>
+
+<a-cylinder
+    position="10.55 3.15 -2.05"
+    rotation="90 0 0"
+    radius="0.16"
+    height="0.08"
+    color="#555">
+</a-cylinder>
+
+<a-cylinder
+    position="10.05 3.1 -2.15"
+    rotation="0 0 90"
+    radius="0.025"
+    height="0.9"
+    color="red">
+</a-cylinder>
+
+<a-cylinder
+    position="11.05 3.1 -2.15"
+    rotation="0 0 90"
+    radius="0.025"
+    height="0.9"
+    color="black">
+</a-cylinder>
+
+<a-text
+    value="MULTIMETER"
+    position="10.0 2.35 -2.25"
+    color="white"
+    width="4">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- TESPEN -->
+<!-- ================================================= -->
+
+<a-cylinder
+    id="tespen"
+    class="clickable"
+    position="11.55 3.25 -2.30"
+    radius="0.10"
+    height="1.35"
+    color="yellow">
+</a-cylinder>
+
+<a-cone
+    position="11.55 2.55 -2.30"
+    radius-bottom="0.10"
+    radius-top="0.02"
+    height="0.30"
+    color="#777">
+</a-cone>
+
+<a-sphere
+    position="11.55 3.75 -2.30"
+    radius="0.10"
+    color="red">
+</a-sphere>
+
+<a-text
+    value="TESPEN"
+    position="11.18 2.35 -2.30"
+    color="white"
+    width="3">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- OBENG -->
+<!-- ================================================= -->
+
+<a-cylinder
+    id="screwdriver"
+    class="clickable"
+    position="9.15 3.25 -1.65"
+    radius="0.10"
+    height="1.30"
+    color="red">
+</a-cylinder>
+
+<a-cylinder
+    position="9.15 2.55 -1.65"
+    radius="0.035"
+    height="0.75"
+    color="#bdbdbd">
+</a-cylinder>
+
+<a-cone
+    position="9.15 2.15 -1.65"
+    radius-bottom="0.06"
+    radius-top="0.01"
+    height="0.20"
+    color="#eeeeee">
+</a-cone>
+
+<a-text
+    value="OBENG"
+    position="8.75 1.95 -1.65"
+    color="white"
+    width="3">
+</a-text>
+
+
+<!-- ================================================= -->
+<!-- OPERATOR -->
+<!-- ================================================= -->
+
+<a-entity id="operator">
+
+    <a-cylinder
+        position="2.4 1.55 1.2"
+        radius="0.48"
+        height="1.55"
+        color="#1565c0">
+    </a-cylinder>
+
+    <a-box
+        position="2.4 1.65 0.75"
+        width="0.9"
+        height="1.25"
+        depth="0.08"
+        color="#ff9800">
+    </a-box>
+
+    <a-sphere
+        id="operatorHead"
+        position="2.4 2.75 1.2"
+        radius="0.42"
+        color="#d7a27c">
+    </a-sphere>
+
+    <a-sphere
+        position="2.25 2.78 0.82"
+        radius="0.045"
+        color="#111">
+    </a-sphere>
+
+    <a-sphere
+        position="2.55 2.78 0.82"
+        radius="0.045"
+        color="#111">
+    </a-sphere>
+
+    <a-cylinder
+        position="1.75 1.95 1.15"
+        rotation="0 0 55"
+        radius="0.13"
+        height="1.15"
+        color="#1565c0">
+    </a-cylinder>
+
+    <a-sphere
+        id="operatorLeftHand"
+        position="1.35 1.55 1.15"
+        radius="0.16"
+        color="#d7a27c">
+    </a-sphere>
+
+    <a-entity
+        id="operatorRightArm"
+        position="3.05 1.95 1.15"
+        rotation="0 0 -35">
+
+        <a-cylinder
+            position="0 -0.45 0"
+            radius="0.13"
+            height="1.15"
+            color="#1565c0">
+        </a-cylinder>
+
+        <a-sphere
+            id="operatorRightHand"
+            position="0 -1.0 0"
+            radius="0.17"
+            color="#d7a27c">
+        </a-sphere>
+
+    </a-entity>
+
+    <a-cylinder
+        position="2.12 0.65 1.2"
+        radius="0.18"
+        height="1.45"
+        color="#263238">
+    </a-cylinder>
+
+    <a-cylinder
+        position="2.68 0.65 1.2"
+        radius="0.18"
+        height="1.45"
+        color="#263238">
+    </a-cylinder>
+
+    <a-box
+        id="operatorShoeLeft"
+        position="2.12 0.08 0.92"
+        width="0.45"
+        height="0.20"
+        depth="0.75"
+        color="#111">
+    </a-box>
+
+    <a-box
+        id="operatorShoeRight"
+        position="2.68 0.08 0.92"
+        width="0.45"
+        height="0.20"
+        depth="0.75"
+        color="#111">
+    </a-box>
+
+    <a-text
+        value="OPERATOR"
+        position="1.75 3.35 1.15"
+        color="white"
+        width="3">
+    </a-text>
+
+    <a-entity
+        id="operatorHelmet"
+        visible="false">
+
+        <a-sphere
+            position="2.4 3.03 1.2"
+            radius="0.48"
+            scale="1 0.65 1"
+            color="yellow">
+        </a-sphere>
+
+        <a-box
+            position="2.4 2.78 1.2"
+            width="1.0"
+            height="0.10"
+            depth="0.70"
+            color="yellow">
+        </a-box>
+
+        <a-box
+            position="2.4 2.68 0.93"
+            width="0.70"
+            height="0.08"
+            depth="0.20"
+            color="#222">
+        </a-box>
+
+    </a-entity>
+
+    <a-sphere
+        id="operatorGloveLeft"
+        visible="false"
+        position="1.35 1.55 1.15"
+        radius="0.19"
+        scale="0.8 1.3 0.6"
+        color="#1976d2">
+    </a-sphere>
+
+    <a-sphere
+        id="operatorGloveRight"
+        visible="false"
+        position="3.05 0.95 1.15"
+        radius="0.19"
+        scale="0.8 1.3 0.6"
+        color="#1976d2">
+    </a-sphere>
+
+</a-entity>
+
+
+</a-scene>
+
+
+<script>
+
+/* ================================================= */
+/* VR CONTROLLER COMPONENT */
+/* ================================================= */
+
+AFRAME.registerComponent(
+"vr-trigger",
+{
+
+    init:function(){
+
+        const el = this.el;
+
+        el.addEventListener(
+        "triggerdown",
+        function(){
+
+            const raycaster =
+            el.components.raycaster;
+
+            if(!raycaster){
+                return;
+            }
+
+            const intersections =
+            raycaster.intersections;
+
+            if(!intersections ||
+               intersections.length === 0){
+                return;
+            }
+
+            const hit =
+            intersections[0];
+
+            if(!hit ||
+               !hit.object){
+                return;
+            }
+
+            let target =
+            hit.object.el;
+
+            if(!target){
+                return;
+            }
+
+            while(
+                target &&
+                !target.classList.contains(
+                    "clickable"
+                ) &&
+                target.parentEl
+            ){
+
+                target =
+                target.parentEl;
+
+            }
+
+            if(
+                target &&
+                target.classList.contains(
+                    "clickable"
+                )
+            ){
+
+                target.emit(
+                    "click",
+                    {
+                        cursorEl:el,
+                        intersection:hit
+                    }
+                );
+
+            }
+
+        });
+
+    }
+
+});
+
+
+/* ================================================= */
+/* DOM READY */
+/* ================================================= */
+
+document.addEventListener(
+"DOMContentLoaded",
+function(){
+
+
+/* ================================================= */
+/* OBJECT */
+/* ================================================= */
+
+const startButton =
+document.getElementById("startButton");
+
+const stopButton =
+document.getElementById("stopButton");
+
+const emergencyButton =
+document.getElementById("emergencyButton");
+
+const breaker =
+document.getElementById("breaker");
+
+const breakerHandle =
+document.getElementById("breakerHandle");
+
+const roller =
+document.getElementById("roller");
+
+const statusText =
+document.getElementById("statusText");
+
+const mainStatus =
+document.getElementById("mainStatus");
+
+const breakerText =
+document.getElementById("breakerText");
+
+const powerLamp =
+document.getElementById("powerLamp");
+
+const powerText =
+document.getElementById("powerText");
+
+const lotoLock =
+document.getElementById("lotoLock");
+
+const lockBody =
+document.getElementById("lockBody");
+
+const lotoTag =
+document.getElementById("lotoTag");
+
+const lockTarget =
+document.getElementById("lockTarget");
+
+const tagTarget =
+document.getElementById("tagTarget");
+
+const info =
+document.getElementById("info");
+
+const resetTraining =
+document.getElementById("resetTraining");
+
+const startTraining =
+document.getElementById("startTraining");
+
+const timerDisplay =
+document.getElementById("timer");
+
+const scoreDisplay =
+document.getElementById("score");
+
+const errorDisplay =
+document.getElementById("errorCount");
+
+
+/* ================================================= */
+/* VR OBJECT */
+/* ================================================= */
+
+const scene =
+document.getElementById("scene");
+
+const camera =
+document.getElementById("camera");
+
+const vrHUD =
+document.getElementById("vrHUD");
+
+const vrStartTraining =
+document.getElementById("vrStartTraining");
+
+const vrResetTraining =
+document.getElementById("vrResetTraining");
+
+const vrStatus =
+document.getElementById("vrStatus");
+
+const vrScore =
+document.getElementById("vrScore");
+
+const vrTimer =
+document.getElementById("vrTimer");
+
+const vrError =
+document.getElementById("vrError");
+
+const vrCurrentStep =
+document.getElementById("vrCurrentStep");
+
+
+/* ================================================= */
+/* PPE */
+/* ================================================= */
+
+const helmet =
+document.getElementById("helmet");
+
+const helmetBottom =
+document.getElementById("helmetBottom");
+
+const safetyShoe1 =
+document.getElementById("safetyShoe1");
+
+const safetyShoe2 =
+document.getElementById("safetyShoe2");
+
+const gloveLeft =
+document.getElementById("gloveLeft");
+
+const gloveRight =
+document.getElementById("gloveRight");
+
+const multimeter =
+document.getElementById("multimeter");
+
+const tespen =
+document.getElementById("tespen");
+
+
+/* ================================================= */
+/* OPERATOR */
+/* ================================================= */
+
+const operatorRightArm =
+document.getElementById("operatorRightArm");
+
+const operatorRightHand =
+document.getElementById("operatorRightHand");
+
+const operatorLeftHand =
+document.getElementById("operatorLeftHand");
+
+const operatorHelmet =
+document.getElementById("operatorHelmet");
+
+const operatorGloveLeft =
+document.getElementById("operatorGloveLeft");
+
+const operatorGloveRight =
+document.getElementById("operatorGloveRight");
+
+const operatorShoeLeft =
+document.getElementById("operatorShoeLeft");
+
+const operatorShoeRight =
+document.getElementById("operatorShoeRight");
+
+
+/* ================================================= */
+/* STATUS TRAINING */
+/* ================================================= */
+
+let trainingStarted = false;
+let trainingFinished = false;
+
+let elapsedSeconds = 0;
+let timerInterval = null;
+
+let score = 100;
+let wrongActions = 0;
+
+let helmetUsed = false;
+let safetyShoesUsed = false;
+let glovesUsed = false;
+
+let machineRunning = false;
+let machineStopped = false;
+let emergencyActive = false;
+
+let breakerOff = false;
+
+let lockTaken = false;
+let lockInstalled = false;
+
+let tagTaken = false;
+let tagInstalled = false;
+
+let zeroEnergyVerified = false;
+
+let verificationTool = "";
+
+let animationBusy = false;
+
+
+/* ================================================= */
+/* VR STEP TEXT */
+/* ================================================= */
+
+const vrSteps = [
+
+    "PAKAI HELMET",
+    "PAKAI SAFETY SHOES",
+    "PAKAI RUBBER GLOVES",
+    "START MACHINE",
+    "STOP MACHINE",
+    "EMERGENCY STOP",
+    "BREAKER OFF",
+    "AMBIL LOCK",
+    "PASANG LOCK",
+    "AMBIL TAG",
+    "PASANG TAG",
+    "LOTO ACTIVE",
+    "TEST POWER OFF",
+    "ZERO ENERGY VERIFIED"
+
+];
+
+let currentStep = 1;
+
+
+/* ================================================= */
+/* VR HUD UPDATE */
+/* ================================================= */
+
+function updateVRHUD(){
+
+    if(vrStatus){
+
+        vrStatus.setAttribute(
+            "value",
+            "STATUS : " + mainStatus.innerHTML
+        );
+
+    }
+
+    if(vrScore){
+
+        vrScore.setAttribute(
+            "value",
+            "SCORE : " + score
+        );
+
+    }
+
+    if(vrTimer){
+
+        vrTimer.setAttribute(
+            "value",
+            "TIME : " +
+            formatTime(elapsedSeconds)
+        );
+
+    }
+
+    if(vrError){
+
+        vrError.setAttribute(
+            "value",
+            "ERROR : " + wrongActions
+        );
+
+    }
+
+    if(vrCurrentStep){
+
+        if(currentStep >= 1 &&
+           currentStep <= 14){
+
+            vrCurrentStep.setAttribute(
+                "value",
+                "STEP " +
+                currentStep +
+                " : " +
+                vrSteps[currentStep-1]
+            );
+
+        }
+        else{
+
+            vrCurrentStep.setAttribute(
+                "value",
+                "TRAINING SELESAI"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* ================================================= */
+/* VR CURRENT STEP */
+/* ================================================= */
+
+function setVRStep(step){
+
+    currentStep = step;
+
+    updateVRHUD();
+
+}
+
+
+/* ================================================= */
+/* TIMER */
+/* ================================================= */
+
+function formatTime(seconds){
+
+    const minutes =
+    Math.floor(seconds / 60);
+
+    const secs =
+    seconds % 60;
+
+    return String(minutes).padStart(2,"0")
+    + ":" +
+    String(secs).padStart(2,"0");
+
+}
+
+
+function updateTrainingDisplay(){
+
+    timerDisplay.innerHTML =
+    formatTime(elapsedSeconds);
+
+    scoreDisplay.innerHTML =
+    score;
+
+    errorDisplay.innerHTML =
+    wrongActions;
+
+    updateVRHUD();
+
+}
+
+
+function calculateCurrentScore(){
+
+    const timePenalty =
+    Math.floor(elapsedSeconds / 30) * 2;
+
+    score =
+    Math.max(
+        0,
+        100 -
+        (wrongActions * 5) -
+        timePenalty
+    );
+
+    updateTrainingDisplay();
+
+}
+
+
+function startTimer(){
+
+    clearInterval(timerInterval);
+
+    timerInterval =
+    setInterval(function(){
+
+        if(!trainingStarted ||
+           trainingFinished){
+
+            return;
+
+        }
+
+        elapsedSeconds++;
+
+        calculateCurrentScore();
+
+    },1000);
+
+}
+
+
+function stopTimer(){
+
+    clearInterval(timerInterval);
+
+    timerInterval = null;
+
+}
+
+
+/* ================================================= */
+/* WRONG ACTION */
+/* ================================================= */
+
+function wrongAction(message){
+
+    if(!trainingStarted){
+
+        info.innerHTML =
+        "<b>TRAINING BELUM DIMULAI</b><br>" +
+        "Tekan START TRAINING terlebih dahulu.";
+
+        return;
+
+    }
+
+    if(trainingFinished){
+
+        return;
+
+    }
+
+    wrongActions++;
+
+    calculateCurrentScore();
+
+    info.innerHTML =
+    "<b>⚠️ URUTAN SALAH</b><br>" +
+    message +
+    "<br><br>" +
+    "Penalti: -5 poin";
+
+    updateVRHUD();
+
+}
+
+
+/* ================================================= */
+/* START TRAINING PROCESS */
+/* ================================================= */
+
+function beginTraining(){
+
+    if(trainingStarted){
+
+        info.innerHTML =
+        "<b>TRAINING SUDAH DIMULAI</b><br>" +
+        "Training sedang berjalan.";
+
+        return;
+
+    }
+
+    if(trainingFinished){
+
+        return;
+
+    }
+
+    trainingStarted = true;
+
+    trainingFinished = false;
+
+    elapsedSeconds = 0;
+
+    score = 100;
+
+    wrongActions = 0;
+
+    currentStep = 1;
+
+    updateTrainingDisplay();
+
+    startTimer();
+
+    startTraining.disabled = true;
+
+    mainStatus.innerHTML =
+    "TRAINING";
+
+    setVRStep(1);
+
+    info.innerHTML =
+    "<b>TRAINING DIMULAI</b><br>" +
+    "Ikuti checklist dari Step 1.<br>" +
+    "Mulai dengan menggunakan HELMET.";
+
+}
+
+
+/* ================================================= */
+/* DESKTOP START */
+/* ================================================= */
+
+startTraining.addEventListener(
+"click",
+beginTraining
+);
+
+
+/* ================================================= */
+/* VR START */
+/* ================================================= */
+
+vrStartTraining.addEventListener(
+"click",
+function(){
+
+    beginTraining();
+
+});
+
+
+/* ================================================= */
+/* CHECKLIST */
+/* ================================================= */
+
+function setStepDone(stepNumber,text){
+
+    const step =
+    document.getElementById(
+        "step"+stepNumber
+    );
+
+    if(step){
+
+        step.innerHTML =
+        "✅ "+text;
+
+    }
+
+}
+
+
+function setStepNext(stepNumber,text){
+
+    const step =
+    document.getElementById(
+        "step"+stepNumber
+    );
+
+    if(step){
+
+        step.innerHTML =
+        "➡️ "+text;
+
+    }
+
+    setVRStep(stepNumber);
+
+}
+
+
+function setStepPending(stepNumber,text){
+
+    const step =
+    document.getElementById(
+        "step"+stepNumber
+    );
+
+    if(step){
+
+        step.innerHTML =
+        "⬜ "+text;
+
+    }
+
+}
+
+
+/* ================================================= */
+/* TRAINING CHECK */
+/* ================================================= */
+
+function requireTraining(){
+
+    if(!trainingStarted){
+
+        info.innerHTML =
+        "<b>TRAINING BELUM DIMULAI</b><br>" +
+        "Tekan START TRAINING terlebih dahulu.";
+
+        updateVRHUD();
+
+        return false;
+
+    }
+
+    if(trainingFinished){
+
+        info.innerHTML =
+        "<b>TRAINING SUDAH SELESAI</b>";
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+/* ================================================= */
+/* ANIMATION HELPER */
+/* ================================================= */
+
+function moveRightHand(
+position,
+rotation,
+duration,
+callback
+){
+
+    animationBusy = true;
+
+    operatorRightArm.setAttribute(
+        "animation__position",
+        "property:position;" +
+        "to:"+position+";" +
+        "dur:"+duration+";" +
+        "easing:easeInOutQuad"
+    );
+
+    operatorRightArm.setAttribute(
+        "animation__rotation",
+        "property:rotation;" +
+        "to:"+rotation+";" +
+        "dur:"+duration+";" +
+        "easing:easeInOutQuad"
+    );
+
+    setTimeout(function(){
+
+        animationBusy = false;
+
+        if(callback){
+            callback();
+        }
+
+    },duration+80);
+
+}
+
+
+/* ================================================= */
+/* RETURN HAND */
+/* ================================================= */
+
+function returnRightHand(callback){
+
+    moveRightHand(
+        "3.05 1.95 1.15",
+        "0 0 -35",
+        700,
+        callback
+    );
+
+}
+
+
+/* ================================================= */
+/* HELMET ANIMATION */
+/* ================================================= */
+
+function animateHelmet(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(helmetUsed){
+
+        info.innerHTML =
+        "<b>HELMET SUDAH DIGUNAKAN</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Tangan bergerak mengambil Helmet...";
+
+    moveRightHand(
+        "8.9 3.9 -2.35",
+        "0 0 -65",
+        1100,
+        function(){
+
+            info.innerHTML =
+            "<b>OPERATOR</b><br>" +
+            "Helmet disentuh dan diambil...";
+
+            helmet.setAttribute(
+                "animation__pickup",
+                "property:position;" +
+                "to:8.9 3.55 -2.35;" +
+                "dur:450;" +
+                "easing:easeInOutQuad"
+            );
+
+            helmetBottom.setAttribute(
+                "animation__pickup",
+                "property:position;" +
+                "to:8.9 3.27 -2.35;" +
+                "dur:450;" +
+                "easing:easeInOutQuad"
+            );
+
+            setTimeout(function(){
+
+                info.innerHTML =
+                "<b>OPERATOR</b><br>" +
+                "Helmet dibawa ke kepala operator...";
+
+                moveRightHand(
+                    "2.9 3.25 1.15",
+                    "0 0 -15",
+                    1100,
+                    function(){
+
+                        helmet.setAttribute(
+                            "visible",
+                            "false"
+                        );
+
+                        helmetBottom.setAttribute(
+                            "visible",
+                            "false"
+                        );
+
+                        operatorHelmet.setAttribute(
+                            "visible",
+                            "true"
+                        );
+
+                        returnRightHand(function(){
+
+                            helmetUsed = true;
+
+                            setStepDone(
+                                1,
+                                "PAKAI HELMET"
+                            );
+
+                            setStepNext(
+                                2,
+                                "PAKAI SAFETY SHOES"
+                            );
+
+                            info.innerHTML =
+                            "<b>HELMET TERPASANG</b><br>" +
+                            "Operator menggunakan helmet.";
+
+                        });
+
+                    }
+                );
+
+            },500);
+
+        }
+    );
+
+}
+
+
+helmet.addEventListener(
+"click",
+animateHelmet
+);
+
+
+/* ================================================= */
+/* SAFETY SHOES */
+/* ================================================= */
+
+function useSafetyShoes(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!helmetUsed){
+
+        wrongAction(
+        "Gunakan Helmet terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(safetyShoesUsed){
+
+        info.innerHTML =
+        "<b>SAFETY SHOES SUDAH DIGUNAKAN</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Tangan bergerak mengambil Safety Shoes...";
+
+    moveRightHand(
+        "10.55 1.65 -2.45",
+        "0 0 90",
+        1200,
+        function(){
+
+            info.innerHTML =
+            "<b>OPERATOR</b><br>" +
+            "Safety Shoes diambil...";
+
+            safetyShoe1.setAttribute(
+                "animation__pickup",
+                "property:position;" +
+                "to:10.55 1.55 -2.45;" +
+                "dur:400;" +
+                "easing:easeInOutQuad"
+            );
+
+            setTimeout(function(){
+
+                moveRightHand(
+                    "2.68 0.75 1.05",
+                    "0 0 80",
+                    1200,
+                    function(){
+
+                        safetyShoe1.setAttribute(
+                            "visible",
+                            "false"
+                        );
+
+                        info.innerHTML =
+                        "<b>SAFETY SHOE 1 TERPASANG</b><br>" +
+                        "Mengambil safety shoe kedua...";
+
+                        moveRightHand(
+                            "11.05 1.65 -2.45",
+                            "0 0 90",
+                            1000,
+                            function(){
+
+                                safetyShoe2.setAttribute(
+                                    "animation__pickup",
+                                    "property:position;" +
+                                    "to:11.05 1.55 -2.45;" +
+                                    "dur:400;" +
+                                    "easing:easeInOutQuad"
+                                );
+
+                                setTimeout(function(){
+
+                                    moveRightHand(
+                                        "2.12 0.75 1.05",
+                                        "0 0 80",
+                                        1100,
+                                        function(){
+
+                                            safetyShoe2.setAttribute(
+                                                "visible",
+                                                "false"
+                                            );
+
+                                            returnRightHand(function(){
+
+                                                safetyShoesUsed = true;
+
+                                                setStepDone(
+                                                    2,
+                                                    "PAKAI SAFETY SHOES"
+                                                );
+
+                                                setStepNext(
+                                                    3,
+                                                    "PAKAI RUBBER GLOVES"
+                                                );
+
+                                                info.innerHTML =
+                                                "<b>SAFETY SHOES TERPASANG</b><br>" +
+                                                "Gunakan Rubber Gloves.";
+
+                                            });
+
+                                        }
+                                    );
+
+                                },450);
+
+                            }
+                        );
+
+                    }
+                );
+
+            },450);
+
+        }
+    );
+
+}
+
+
+safetyShoe1.addEventListener(
+"click",
+useSafetyShoes
+);
+
+safetyShoe2.addEventListener(
+"click",
+useSafetyShoes
+);
+
+
+/* ================================================= */
+/* RUBBER GLOVES */
+/* ================================================= */
+
+function useGloves(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!safetyShoesUsed){
+
+        wrongAction(
+        "Gunakan Safety Shoes terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(glovesUsed){
+
+        info.innerHTML =
+        "<b>RUBBER GLOVES SUDAH DIGUNAKAN</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Tangan mengambil Rubber Gloves...";
+
+    moveRightHand(
+        "9.0 2.15 -1.95",
+        "0 0 -10",
+        1000,
+        function(){
+
+            gloveLeft.setAttribute(
+                "animation__pickup",
+                "property:position;" +
+                "to:9.0 2.05 -1.95;" +
+                "dur:400;" +
+                "easing:easeInOutQuad"
+            );
+
+            setTimeout(function(){
+
+                moveRightHand(
+                    "2.95 1.45 1.15",
+                    "0 0 -40",
+                    1000,
+                    function(){
+
+                        gloveLeft.setAttribute(
+                            "visible",
+                            "false"
+                        );
+
+                        operatorGloveRight.setAttribute(
+                            "visible",
+                            "true"
+                        );
+
+                        info.innerHTML =
+                        "<b>GLOVE PERTAMA TERPASANG</b><br>" +
+                        "Mengambil glove kedua...";
+
+                        moveRightHand(
+                            "9.65 2.15 -1.95",
+                            "0 0 -10",
+                            1000,
+                            function(){
+
+                                gloveRight.setAttribute(
+                                    "animation__pickup",
+                                    "property:position;" +
+                                    "to:9.65 2.05 -1.95;" +
+                                    "dur:400;" +
+                                    "easing:easeInOutQuad"
+                                );
+
+                                setTimeout(function(){
+
+                                    moveRightHand(
+                                        "1.35 1.55 1.15",
+                                        "0 0 40",
+                                        1000,
+                                        function(){
+
+                                            gloveRight.setAttribute(
+                                                "visible",
+                                                "false"
+                                            );
+
+                                            operatorGloveLeft.setAttribute(
+                                                "visible",
+                                                "true"
+                                            );
+
+                                            returnRightHand(function(){
+
+                                                glovesUsed = true;
+
+                                                setStepDone(
+                                                    3,
+                                                    "PAKAI RUBBER GLOVES"
+                                                );
+
+                                                setStepNext(
+                                                    4,
+                                                    "START MACHINE"
+                                                );
+
+                                                info.innerHTML =
+                                                "<b>APD LENGKAP</b><br>" +
+                                                "Helmet, Safety Shoes dan Rubber Gloves terpasang.<br>" +
+                                                "Tekan START MACHINE.";
+
+                                            });
+
+                                        }
+                                    );
+
+                                },450);
+
+                            }
+                        );
+
+                    }
+                );
+
+            },450);
+
+        }
+    );
+
+}
+
+
+gloveLeft.addEventListener(
+"click",
+useGloves
+);
+
+gloveRight.addEventListener(
+"click",
+useGloves
+);
+
+
+/* ================================================= */
+/* START MACHINE */
+/* ================================================= */
+
+startButton.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!helmetUsed ||
+       !safetyShoesUsed ||
+       !glovesUsed){
+
+        wrongAction(
+        "Lengkapi APD terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(emergencyActive){
+
+        wrongAction(
+        "Emergency Stop masih aktif."
+        );
+
+        return;
+
+    }
+
+    if(breakerOff){
+
+        wrongAction(
+        "MAIN BREAKER sudah OFF."
+        );
+
+        return;
+
+    }
+
+    if(machineRunning){
+
+        info.innerHTML =
+        "<b>MESIN SUDAH RUNNING</b>";
+
+        return;
+
+    }
+
+    machineRunning = true;
+    machineStopped = false;
+
+    roller.setAttribute(
+        "animation",
+        "property:rotation;" +
+        "to:0 0 810;" +
+        "loop:true;" +
+        "dur:1500;" +
+        "easing:linear"
+    );
+
+    statusText.setAttribute(
+        "value",
+        "RUNNING"
+    );
+
+    statusText.setAttribute(
+        "color",
+        "lime"
+    );
+
+    mainStatus.innerHTML =
+    "RUNNING";
+
+    setStepDone(
+        4,
+        "START MACHINE"
+    );
+
+    setStepNext(
+        5,
+        "STOP MACHINE"
+    );
+
+    info.innerHTML =
+    "<b>MESIN RUNNING</b><br>" +
+    "Tekan STOP.";
+
+});
+
+
+/* ================================================= */
+/* STOP */
+/* ================================================= */
+
+stopButton.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!machineRunning){
+
+        wrongAction(
+        "START MACHINE terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    machineRunning = false;
+    machineStopped = true;
+
+    roller.removeAttribute(
+        "animation"
+    );
+
+    statusText.setAttribute(
+        "value",
+        "STOP"
+    );
+
+    statusText.setAttribute(
+        "color",
+        "red"
+    );
+
+    mainStatus.innerHTML =
+    "STOP";
+
+    setStepDone(
+        5,
+        "STOP MACHINE"
+    );
+
+    setStepNext(
+        6,
+        "EMERGENCY STOP"
+    );
+
+    info.innerHTML =
+    "<b>STEP 5 BERHASIL</b><br>" +
+    "Lakukan Emergency Stop.";
+
+});
+
+
+/* ================================================= */
+/* EMERGENCY STOP */
+/* ================================================= */
+
+emergencyButton.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!machineStopped){
+
+        wrongAction(
+        "STOP MACHINE terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(emergencyActive){
+
+        info.innerHTML =
+        "<b>EMERGENCY STOP SUDAH AKTIF</b>";
+
+        return;
+
+    }
+
+    emergencyActive = true;
+
+    roller.removeAttribute(
+        "animation"
+    );
+
+    statusText.setAttribute(
+        "value",
+        "EMERGENCY"
+    );
+
+    statusText.setAttribute(
+        "color",
+        "red"
+    );
+
+    mainStatus.innerHTML =
+    "EMERGENCY";
+
+    setStepDone(
+        6,
+        "EMERGENCY STOP"
+    );
+
+    setStepNext(
+        7,
+        "BREAKER OFF"
+    );
+
+    info.innerHTML =
+    "<b>EMERGENCY STOP ACTIVE</b><br>" +
+    "Matikan MAIN BREAKER.";
+
+});
+
+
+/* ================================================= */
+/* BREAKER OFF */
+/* ================================================= */
+
+breaker.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!emergencyActive){
+
+        wrongAction(
+        "Emergency Stop terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(breakerOff){
+
+        info.innerHTML =
+        "<b>MAIN BREAKER SUDAH OFF</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Tangan bergerak menuju MAIN BREAKER...";
+
+    moveRightHand(
+        "4.55 2.9 -2.15",
+        "0 0 70",
+        1000,
+        function(){
+
+            info.innerHTML =
+            "<b>OPERATOR</b><br>" +
+            "Mengoperasikan MAIN BREAKER ke posisi OFF...";
+
+            breakerHandle.setAttribute(
+                "animation__off",
+                "property:position;" +
+                "to:4.2 2.45 -2.10;" +
+                "dur:500;" +
+                "easing:easeInOutQuad"
+            );
+
+            setTimeout(function(){
+
+                breakerOff = true;
+
+                breaker.setAttribute(
+                    "color",
+                    "#333"
+                );
+
+                breakerText.setAttribute(
+                    "value",
+                    "OFF"
+                );
+
+                breakerText.setAttribute(
+                    "color",
+                    "red"
+                );
+
+                powerLamp.setAttribute(
+                    "color",
+                    "red"
+                );
+
+                powerText.setAttribute(
+                    "value",
+                    "POWER OFF"
+                );
+
+                powerText.setAttribute(
+                    "color",
+                    "red"
+                );
+
+                statusText.setAttribute(
+                    "value",
+                    "POWER OFF"
+                );
+
+                statusText.setAttribute(
+                    "color",
+                    "red"
+                );
+
+                mainStatus.innerHTML =
+                "POWER OFF";
+
+                returnRightHand(function(){
+
+                    setStepDone(
+                        7,
+                        "BREAKER OFF"
+                    );
+
+                    setStepNext(
+                        8,
+                        "AMBIL LOCK"
+                    );
+
+                    info.innerHTML =
+                    "<b>MAIN BREAKER OFF</b><br>" +
+                    "Ambil LOTO LOCK.";
+
+                });
+
+            },600);
+
+        }
+    );
+
+});
+
+
+/* ================================================= */
+/* AMBIL LOCK */
+/* ================================================= */
+
+lotoLock.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!breakerOff){
+
+        wrongAction(
+        "Matikan MAIN BREAKER terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(lockTaken){
+
+        info.innerHTML =
+        "<b>LOCK SUDAH DIAMBIL</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Tangan mengambil LOTO LOCK...";
+
+    moveRightHand(
+        "6.75 3.5 -2.5",
+        "0 0 -20",
+        1100,
+        function(){
+
+            lockTaken = true;
+
+            lotoLock.setAttribute(
+                "animation__pickup",
+                "property:position;" +
+                "to:6.5 1.5 -1.8;" +
+                "dur:500;" +
+                "easing:easeInOutQuad"
+            );
+
+            lockBody.setAttribute(
+                "animation__pickup",
+                "property:position;" +
+                "to:6.5 1.05 -1.8;" +
+                "dur:500;" +
+                "easing:easeInOutQuad"
+            );
+
+            setTimeout(function(){
+
+                returnRightHand(function(){
+
+                    setStepDone(
+                        8,
+                        "AMBIL LOCK"
+                    );
+
+                    setStepNext(
+                        9,
+                        "PASANG LOCK"
+                    );
+
+                    info.innerHTML =
+                    "<b>LOCK DIAMBIL</b><br>" +
+                    "Klik LOCK HERE.";
+
+                });
+
+            },550);
+
+        }
+    );
+
+});
+
+
+/* ================================================= */
+/* PASANG LOCK */
+/* ================================================= */
+
+lockTarget.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!lockTaken){
+
+        wrongAction(
+        "Ambil LOCK terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(lockInstalled){
+
+        info.innerHTML =
+        "<b>LOCK SUDAH TERPASANG</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Membawa LOCK menuju breaker...";
+
+    moveRightHand(
+        "4.55 1.9 -2.0",
+        "0 0 90",
+        1000,
+        function(){
+
+            info.innerHTML =
+            "<b>OPERATOR</b><br>" +
+            "Memasang LOCK pada breaker...";
+
+            lotoLock.removeAttribute(
+                "animation__pickup"
+            );
+
+            lotoLock.setAttribute(
+                "position",
+                "4.2 1.9 -1.85"
+            );
+
+            lockBody.removeAttribute(
+                "animation__pickup"
+            );
+
+            lockBody.setAttribute(
+                "position",
+                "4.2 1.45 -1.85"
+            );
+
+            lockInstalled = true;
+
+            lockTarget.setAttribute(
+                "color",
+                "red"
+            );
+
+            setTimeout(function(){
+
+                returnRightHand(function(){
+
+                    setStepDone(
+                        9,
+                        "PASANG LOCK"
+                    );
+
+                    setStepNext(
+                        10,
+                        "AMBIL TAG"
+                    );
+
+                    info.innerHTML =
+                    "<b>LOCK TERPASANG</b><br>" +
+                    "Ambil LOTO TAG.";
+
+                });
+
+            },500);
+
+        }
+    );
+
+});
+
+
+/* ================================================= */
+/* AMBIL TAG */
+/* ================================================= */
+
+lotoTag.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!lockInstalled){
+
+        wrongAction(
+        "LOCK harus terpasang terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(tagTaken){
+
+        info.innerHTML =
+        "<b>TAG SUDAH DIAMBIL</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Tangan mengambil LOTO TAG...";
+
+    moveRightHand(
+        "7.75 3.5 -2.5",
+        "0 0 -15",
+        1000,
+        function(){
+
+            tagTaken = true;
+
+            lotoTag.setAttribute(
+                "animation__pickup",
+                "property:position;" +
+                "to:6.5 1.6 -1.8;" +
+                "dur:500;" +
+                "easing:easeInOutQuad"
+            );
+
+            setTimeout(function(){
+
+                returnRightHand(function(){
+
+                    setStepDone(
+                        10,
+                        "AMBIL TAG"
+                    );
+
+                    setStepNext(
+                        11,
+                        "PASANG TAG"
+                    );
+
+                    info.innerHTML =
+                    "<b>TAG DIAMBIL</b><br>" +
+                    "Klik TAG HERE.";
+
+                });
+
+            },550);
+
+        }
+    );
+
+});
+
+
+/* ================================================= */
+/* PASANG TAG */
+/* ================================================= */
+
+tagTarget.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!tagTaken){
+
+        wrongAction(
+        "Ambil TAG terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(tagInstalled){
+
+        info.innerHTML =
+        "<b>TAG SUDAH TERPASANG</b>";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Membawa TAG menuju breaker...";
+
+    moveRightHand(
+        "5.55 1.9 -2.0",
+        "0 0 80",
+        1000,
+        function(){
+
+            lotoTag.removeAttribute(
+                "animation__pickup"
+            );
+
+            lotoTag.setAttribute(
+                "position",
+                "5.15 1.55 -1.80"
+            );
+
+            lotoTag.setAttribute(
+                "rotation",
+                "0 0 -8"
+            );
+
+            tagInstalled = true;
+
+            tagTarget.setAttribute(
+                "color",
+                "yellow"
+            );
+
+            setTimeout(function(){
+
+                returnRightHand(function(){
+
+                    setStepDone(
+                        11,
+                        "PASANG TAG"
+                    );
+
+                    setStepDone(
+                        12,
+                        "LOTO ACTIVE"
+                    );
+
+                    setStepNext(
+                        13,
+                        "TEST POWER OFF"
+                    );
+
+                    statusText.setAttribute(
+                        "value",
+                        "LOTO"
+                    );
+
+                    statusText.setAttribute(
+                        "color",
+                        "yellow"
+                    );
+
+                    mainStatus.innerHTML =
+                    "LOTO ACTIVE";
+
+                    info.innerHTML =
+                    "<b>🔒 LOTO ACTIVE</b><br><br>" +
+                    "LOCK dan TAG sudah terpasang.<br>" +
+                    "Gunakan TESPEN atau MULTIMETER.";
+
+                });
+
+            },500);
+
+        }
+    );
+
+});
+
+
+/* ================================================= */
+/* FINISH TRAINING */
+/* ================================================= */
+
+function finishTraining(){
+
+    trainingFinished = true;
+
+    trainingStarted = false;
+
+    stopTimer();
+
+    calculateCurrentScore();
+
+    currentStep = 14;
+
+    mainStatus.innerHTML =
+    "SELESAI";
+
+    vrCurrentStep.setAttribute(
+        "value",
+        "TRAINING SELESAI"
+    );
+
+    vrStatus.setAttribute(
+        "value",
+        "STATUS : SELESAI"
+    );
+
+    info.innerHTML =
+    "<b>🎉 TRAINING SELESAI</b><br>" +
+    "ZERO ENERGY VERIFIED ✔<br><br>" +
+    "Waktu : " +
+    formatTime(elapsedSeconds) +
+    "<br>" +
+    "Error : " +
+    wrongActions +
+    "<br>" +
+    "SKOR AKHIR : " +
+    score +
+    "/100";
+
+    startTraining.disabled = true;
+
+    updateVRHUD();
+
+}
+
+
+/* ================================================= */
+/* TEST POWER OFF - TESPEN */
+/* ================================================= */
+
+tespen.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!tagInstalled){
+
+        wrongAction(
+        "LOTO harus ACTIVE terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(zeroEnergyVerified){
+
+        info.innerHTML =
+        "<b>ZERO ENERGY SUDAH DIVERIFIKASI</b><br>" +
+        "Menggunakan "+verificationTool+".";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Mengambil TESPEN untuk pengecekan...";
+
+    moveRightHand(
+        "11.55 3.8 -2.3",
+        "0 0 0",
+        1100,
+        function(){
+
+            info.innerHTML =
+            "<b>OPERATOR</b><br>" +
+            "Menguji POWER OFF...";
+
+            moveRightHand(
+                "5.0 2.7 -2.15",
+                "0 0 90",
+                1100,
+                function(){
+
+                    zeroEnergyVerified = true;
+
+                    verificationTool = "TESPEN";
+
+                    tespen.setAttribute(
+                        "color",
+                        "lime"
+                    );
+
+                    setStepDone(
+                        13,
+                        "TEST POWER OFF"
+                    );
+
+                    setStepDone(
+                        14,
+                        "ZERO ENERGY VERIFIED"
+                    );
+
+                    returnRightHand(function(){
+
+                        finishTraining();
+
+                    });
+
+                }
+            );
+
+        }
+    );
+
+});
+
+
+/* ================================================= */
+/* TEST POWER OFF - MULTIMETER */
+/* ================================================= */
+
+multimeter.addEventListener(
+"click",
+function(){
+
+    if(!requireTraining()){
+        return;
+    }
+
+    if(!tagInstalled){
+
+        wrongAction(
+        "LOTO harus ACTIVE terlebih dahulu."
+        );
+
+        return;
+
+    }
+
+    if(zeroEnergyVerified){
+
+        info.innerHTML =
+        "<b>ZERO ENERGY SUDAH DIVERIFIKASI</b><br>" +
+        "Menggunakan "+verificationTool+".";
+
+        return;
+
+    }
+
+    if(animationBusy){
+
+        info.innerHTML =
+        "<b>OPERATOR SEDANG BERGERAK</b>";
+
+        return;
+
+    }
+
+    info.innerHTML =
+    "<b>OPERATOR</b><br>" +
+    "Mengambil MULTIMETER...";
+
+    moveRightHand(
+        "10.55 3.8 -2.25",
+        "0 0 -20",
+        1100,
+        function(){
+
+            info.innerHTML =
+            "<b>OPERATOR</b><br>" +
+            "Membawa multimeter menuju titik pengecekan...";
+
+            moveRightHand(
+                "5.0 2.7 -2.15",
+                "0 0 90",
+                1100,
+                function(){
+
+                    zeroEnergyVerified = true;
+
+                    verificationTool = "MULTIMETER";
+
+                    multimeter.setAttribute(
+                        "color",
+                        "lime"
+                    );
+
+                    setStepDone(
+                        13,
+                        "TEST POWER OFF"
+                    );
+
+                    setStepDone(
+                        14,
+                        "ZERO ENERGY VERIFIED"
+                    );
+
+                    returnRightHand(function(){
+
+                        finishTraining();
+
+                    });
+
+                }
+            );
+
+        }
+    );
+
+});
+
+
+/* ================================================= */
+/* RESET FUNCTION */
+/* ================================================= */
+
+function resetTrainingProcess(){
+
+    stopTimer();
+
+    trainingStarted = false;
+    trainingFinished = false;
+
+    elapsedSeconds = 0;
+
+    score = 100;
+
+    wrongActions = 0;
+
+    helmetUsed = false;
+    safetyShoesUsed = false;
+    glovesUsed = false;
+
+    machineRunning = false;
+    machineStopped = false;
+    emergencyActive = false;
+
+    breakerOff = false;
+
+    lockTaken = false;
+    lockInstalled = false;
+
+    tagTaken = false;
+    tagInstalled = false;
+
+    zeroEnergyVerified = false;
+
+    verificationTool = "";
+
+    animationBusy = false;
+
+    currentStep = 1;
+
+    updateTrainingDisplay();
+
+    startTraining.disabled = false;
+
+
+    /* =============================== */
+    /* MACHINE */
+    /* =============================== */
+
+    roller.removeAttribute(
+        "animation"
+    );
+
+    statusText.setAttribute(
+        "value",
+        "STOP"
+    );
+
+    statusText.setAttribute(
+        "color",
+        "red"
+    );
+
+    mainStatus.innerHTML =
+    "READY";
+
+
+    /* =============================== */
+    /* BREAKER */
+    /* =============================== */
+
+    breaker.setAttribute(
+        "color",
+        "#d50000"
+    );
+
+    breakerHandle.removeAttribute(
+        "animation__off"
+    );
+
+    breakerHandle.setAttribute(
+        "position",
+        "4.2 2.95 -2.10"
+    );
+
+    breakerText.setAttribute(
+        "value",
+        "ON"
+    );
+
+    breakerText.setAttribute(
+        "color",
+        "lime"
+    );
+
+    powerLamp.setAttribute(
+        "color",
+        "lime"
+    );
+
+    powerText.setAttribute(
+        "value",
+        "POWER ON"
+    );
+
+    powerText.setAttribute(
+        "color",
+        "lime"
+    );
+
+
+    /* =============================== */
+    /* LOCK */
+    /* =============================== */
+
+    lotoLock.removeAttribute(
+        "animation__pickup"
+    );
+
+    lotoLock.setAttribute(
+        "position",
+        "6.75 2.9 -2.50"
+    );
+
+    lockBody.removeAttribute(
+        "animation__pickup"
+    );
+
+    lockBody.setAttribute(
+        "position",
+        "6.75 2.45 -2.50"
+    );
+
+    lockTarget.setAttribute(
+        "color",
+        "#777"
+    );
+
+
+    /* =============================== */
+    /* TAG */
+    /* =============================== */
+
+    lotoTag.removeAttribute(
+        "animation__pickup"
+    );
+
+    lotoTag.setAttribute(
+        "position",
+        "7.75 2.75 -2.50"
+    );
+
+    lotoTag.setAttribute(
+        "rotation",
+        "0 0 0"
+    );
+
+    tagTarget.setAttribute(
+        "color",
+        "#777"
+    );
+
+
+    /* =============================== */
+    /* HELMET */
+    /* =============================== */
+
+    helmet.removeAttribute(
+        "animation__pickup"
+    );
+
+    helmet.setAttribute(
+        "visible",
+        "true"
+    );
+
+    helmet.setAttribute(
+        "position",
+        "8.9 3.0 -2.35"
+    );
+
+    helmetBottom.setAttribute(
+        "visible",
+        "true"
+    );
+
+    helmetBottom.setAttribute(
+        "position",
+        "8.9 2.72 -2.35"
+    );
+
+    helmet.setAttribute(
+        "color",
+        "yellow"
+    );
+
+    operatorHelmet.setAttribute(
+        "visible",
+        "false"
+    );
+
+
+    /* =============================== */
+    /* SHOES */
+    /* =============================== */
+
+    safetyShoe1.removeAttribute(
+        "animation__pickup"
+    );
+
+    safetyShoe2.removeAttribute(
+        "animation__pickup"
+    );
+
+    safetyShoe1.setAttribute(
+        "visible",
+        "true"
+    );
+
+    safetyShoe2.setAttribute(
+        "visible",
+        "true"
+    );
+
+    safetyShoe1.setAttribute(
+        "position",
+        "10.05 1.05 -2.45"
+    );
+
+    safetyShoe2.setAttribute(
+        "position",
+        "11.05 1.05 -2.45"
+    );
+
+
+    /* =============================== */
+    /* GLOVES */
+    /* =============================== */
+
+    gloveLeft.removeAttribute(
+        "animation__pickup"
+    );
+
+    gloveRight.removeAttribute(
+        "animation__pickup"
+    );
+
+    gloveLeft.setAttribute(
+        "visible",
+        "true"
+    );
+
+    gloveRight.setAttribute(
+        "visible",
+        "true"
+    );
+
+    gloveLeft.setAttribute(
+        "position",
+        "9.0 1.7 -1.95"
+    );
+
+    gloveRight.setAttribute(
+        "position",
+        "9.65 1.7 -1.95"
+    );
+
+    operatorGloveLeft.setAttribute(
+        "visible",
+        "false"
+    );
+
+    operatorGloveRight.setAttribute(
+        "visible",
+        "false"
+    );
+
+
+    /* =============================== */
+    /* TOOLS */
+    /* =============================== */
+
+    tespen.setAttribute(
+        "color",
+        "yellow"
+    );
+
+    multimeter.setAttribute(
+        "color",
+        "#202020"
+    );
+
+
+    /* =============================== */
+    /* OPERATOR ARM */
+    /* =============================== */
+
+    operatorRightArm.removeAttribute(
+        "animation__position"
+    );
+
+    operatorRightArm.removeAttribute(
+        "animation__rotation"
+    );
+
+    operatorRightArm.setAttribute(
+        "position",
+        "3.05 1.95 1.15"
+    );
+
+    operatorRightArm.setAttribute(
+        "rotation",
+        "0 0 -35"
+    );
+
+
+    /* =============================== */
+    /* CHECKLIST */
+    /* =============================== */
+
+    setStepPending(
+        1,
+        "PAKAI HELMET"
+    );
+
+    setStepPending(
+        2,
+        "PAKAI SAFETY SHOES"
+    );
+
+    setStepPending(
+        3,
+        "PAKAI RUBBER GLOVES"
+    );
+
+    setStepPending(
+        4,
+        "START MACHINE"
+    );
+
+    setStepPending(
+        5,
+        "STOP MACHINE"
+    );
+
+    setStepPending(
+        6,
+        "EMERGENCY STOP"
+    );
+
+    setStepPending(
+        7,
+        "BREAKER OFF"
+    );
+
+    setStepPending(
+        8,
+        "AMBIL LOCK"
+    );
+
+    setStepPending(
+        9,
+        "PASANG LOCK"
+    );
+
+    setStepPending(
+        10,
+        "AMBIL TAG"
+    );
+
+    setStepPending(
+        11,
+        "PASANG TAG"
+    );
+
+    setStepPending(
+        12,
+        "LOTO ACTIVE"
+    );
+
+    setStepPending(
+        13,
+        "TEST POWER OFF"
+    );
+
+    setStepPending(
+        14,
+        "ZERO ENERGY VERIFIED"
+    );
+
+    setStepNext(
+        1,
+        "PAKAI HELMET"
+    );
+
+    info.innerHTML =
+    "<b>TRAINING DI-RESET</b><br>" +
+    "Tekan START TRAINING untuk memulai.";
+
+    updateVRHUD();
+
+}
+
+
+/* ================================================= */
+/* DESKTOP RESET */
+/* ================================================= */
+
+resetTraining.addEventListener(
+"click",
+resetTrainingProcess
+);
+
+
+/* ================================================= */
+/* VR RESET */
+/* ================================================= */
+
+vrResetTraining.addEventListener(
+"click",
+function(){
+
+    resetTrainingProcess();
+
+});
+
+
+/* ================================================= */
+/* ENTER VR */
+/* ================================================= */
+
+scene.addEventListener(
+"enter-vr",
+function(){
+
+    /*
+     * Tampilkan HUD
+     * di kanan bawah
+     */
+
+    vrHUD.setAttribute(
+        "visible",
+        "true"
+    );
+
+    camera.setAttribute(
+        "look-controls",
+        "enabled:true"
+    );
+
+    updateVRHUD();
+
+});
+
+
+/* ================================================= */
+/* EXIT VR */
+/* ================================================= */
+
+scene.addEventListener(
+"exit-vr",
+function(){
+
+    vrHUD.setAttribute(
+        "visible",
+        "false"
+    );
+
+    camera.setAttribute(
+        "look-controls",
+        "enabled:true"
+    );
+
+});
+
+
+/* ================================================= */
+/* INITIAL DISPLAY */
+/* ================================================= */
+
+updateTrainingDisplay();
+
+updateVRHUD();
+
+
+});
+
+</script>
+
+</body>
+</html>
