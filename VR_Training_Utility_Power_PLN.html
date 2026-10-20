@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VR Training Utility Power</title>
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #111827;
+}
+
+#hud {
+  position: fixed;
+  z-index: 10;
+  right: 14px;
+  bottom: 14px;
+  width: 350px;
+  max-width: 42vw;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding: 14px;
+  color: white;
+  background: rgba(8, 20, 34, .96);
+  border: 2px solid #38bdf8;
+  border-radius: 12px;
+}
+
+#hud h2 {
+  margin: 0 0 10px;
+  color: #7dd3fc;
+  font-size: 20px;
+}
+
+#hud p {
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 7px 0;
+}
+
+#stepText {
+  white-space: pre-line;
+  padding: 10px;
+  min-height: 65px;
+  background: #1e293b;
+  border: 1px solid #64748b;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#statusText { color: #fde68a; font-weight: bold; }
+#scoreText { color: #86efac; font-size: 17px !important; font-weight: bold; }
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 11px 6px;
+  border: 0;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #38bdf8;
+  color: #082f49;
+}
+
+button:disabled { opacity: .45; cursor: not-allowed; }
+#btnOff { background: #f87171; color: #450a0a; }
+#btnOn { background: #4ade80; color: #052e16; }
+#btnStart { background: #facc15; color: #422006; }
+#btnReset { background: #cbd5e1; color: #0f172a; }
+#btnHint { background: #a5b4fc; color: #1e1b4b; }
+
+#instructions {
+  color: #cbd5e1;
+  font-size: 11px !important;
+}
+
+body.in-vr #hud {
+  right: 8px;
+  bottom: 8px;
+  width: 280px;
+  max-width: 36vw;
+  max-height: 42vh;
+  padding: 9px;
+  opacity: .9;
+}
+
+body.in-vr #hud h2 { font-size: 15px; }
+body.in-vr #hud p,
+body.in-vr #stepText { font-size: 11px; }
+body.in-vr button { padding: 7px 4px; font-size: 10px; }
+
+@media (max-width: 650px) {
+  #hud { width: 285px; max-width: 55vw; padding: 9px; }
+  #hud h2 { font-size: 16px; }
+  #hud p, #stepText { font-size: 12px; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="hud">
+  <h2>VR TRAINING UTILITY POWER</h2>
+  <p><b>Skenario:</b> <span id="scenarioText">Belum dipilih</span></p>
+  <p><b>Langkah:</b> <span id="stepCount">0 / 5</span></p>
+
+  <div id="stepText">
+Pilih skenario PLN OFF atau PLN ON, lalu tekan MULAI TRAINING.
+  </div>
+
+  <p id="statusText">Status: Menunggu training</p>
+  <p id="scoreText">Skor: 100</p>
+
+  <div class="buttons">
+    <button id="btnOff">PILIH PLN OFF</button>
+    <button id="btnOn">PILIH PLN ON</button>
+    <button id="btnStart">▶ MULAI TRAINING</button>
+    <button id="btnReset">↻ RESET</button>
+    <button id="btnHint">PETUNJUK</button>
+  </div>
+
+  <p id="instructions">
+    Desktop: klik panel yang disorot. VR: arahkan laser controller ke tombol panel lalu tekan trigger.
+    Pilih skenario dan mulai training sebelum masuk VR.
+  </p>
+</div>
+
+<a-scene
+  renderer="colorManagement: true"
+  vr-mode-ui="enabled: true"
+  background="color: #b8cfdf"
+  cursor="rayOrigin: mouse"
+  raycaster="objects: .clickable; far: 20">
+
+  <a-entity light="type: ambient; intensity: 1.1"></a-entity>
+  <a-entity light="type: directional; intensity: 1.4" position="-3 7 5"></a-entity>
+
+  <!-- Lantai dan dinding -->
+  <a-plane
+    rotation="-90 0 0"
+    width="18"
+    height="16"
+    position="0 0 0"
+    material="color: #64748b">
+  </a-plane>
+
+  <a-box
+    position="0 2.8 -5.5"
+    width="16"
+    height="5.6"
+    depth=".2"
+    material="color: #dbeafe">
+  </a-box>
+
+  <a-text
+    value="UTILITY POWER TRAINING"
+    position="0 4.65 -5.3"
+    align="center"
+    width="9"
+    color="#102a43">
+  </a-text>
+
+  <!-- Kamera -->
+  <a-entity id="cameraRig" position="0 0 5.8">
+    <a-camera
+      id="camera"
+      position="0 1.65 0"
+      look-controls="pointerLockEnabled: false">
+      <a-cursor
+        id="desktopCursor"
+        fuse="false"
+        color="#00e5ff"
+        material="shader: flat"
+        geometry="primitive: ring; radiusInner: .008; radiusOuter: .014"
+        raycaster="objects: .clickable; far: 20">
+      </a-cursor>
+    </a-camera>
+  </a-entity>
+
+  <!-- Controller VR -->
+  <a-entity
+    id="rightController"
+    laser-controls="hand: right"
+    raycaster="objects: .clickable; far: 20"
+    line="color: #00e5ff; opacity: .8">
+  </a-entity>
+
+  <a-entity
+    id="leftController"
+    laser-controls="hand: left"
+    raycaster="objects: .clickable; far: 20"
+    line="color: #00e5ff; opacity: .8">
+  </a-entity>
+
+  <!-- Panel dibuat oleh JavaScript -->
+  <a-entity id="panelContainer"></a-entity>
+
+  <a-text
+    value="INTERACTIVE TRAINING"
+    position="0 .12 1.2"
+    rotation="-90 0 0"
+    align="center"
+    width="4"
+    color="#ffffff">
+  </a-text>
+
+</a-scene>
+
+<script>
+(() => {
+  "use strict";
+
+  // =========================================================
+  // PANEL: PLN CONTROL PANEL WAJIB BERADA PALING KIRI
+  // =========================================================
+  const panelInfo = [
+    { id: "PLN",  name: "PLN CONTROL PANEL", x: -5 },
+    { id: "MAIN", name: "MAIN STATION",      x: -2.5 },
+    { id: "VBC",  name: "VBC PANEL",          x:  0 },
+    { id: "F1",   name: "FEEDER PANEL 1",     x:  2.5 },
+    { id: "F2",   name: "FEEDER PANEL 2",     x:  5 }
+  ];
+
+  const panelStates = {
+    PLN: false,
+    MAIN: false,
+    VBC: false,
+    F1: false,
+    F2: false
+  };
+
+  const panelElements = {};
+
+  let selectedMode = "";
+  let steps = [];
+  let currentStep = 0;
+  let score = 100;
+  let running = false;
+  let completed = false;
+  let hintMode = false;
+
+  const $ = id => document.getElementById(id);
+
+  // =========================================================
+  // MEMBUAT PANEL 3D
+  // =========================================================
+  function createPanels() {
+    const container = $("panelContainer");
+
+    panelInfo.forEach(info => {
+      const group = document.createElement("a-entity");
+      group.setAttribute("position", `${info.x} 1.8 -5.1`);
+
+      const body = document.createElement("a-box");
+      body.setAttribute("width", "2.15");
+      body.setAttribute("height", "2.8");
+      body.setAttribute("depth", ".22");
+      body.setAttribute("material",
+        "color: #263746; metalness: .25; roughness: .6");
+      group.appendChild(body);
+
+      // Kotak nama panel
+      const nameBox = document.createElement("a-box");
+      nameBox.setAttribute("position", "0 .88 .13");
+      nameBox.setAttribute("width", "2");
+      nameBox.setAttribute("height", ".72");
+      nameBox.setAttribute("depth", ".06");
+      nameBox.setAttribute("material", "color: #ffffff");
+      group.appendChild(nameBox);
+
+      const nameText = document.createElement("a-text");
+      nameText.setAttribute("value", info.name);
+      nameText.setAttribute("position", "0 .88 .17");
+      nameText.setAttribute("align", "center");
+      nameText.setAttribute("anchor", "center");
+      nameText.setAttribute("width", "1.8");
+      nameText.setAttribute("wrap-count", "17");
+      nameText.setAttribute("color", "#111827");
+      nameText.setAttribute("scale", "1.15 1.15 1.15");
+      group.appendChild(nameText);
+
+      // Kotak indikator
+      const indicatorBox = document.createElement("a-box");
+      indicatorBox.setAttribute("position", "0 .12 .14");
+      indicatorBox.setAttribute("width", "1.75");
+      indicatorBox.setAttribute("height", ".52");
+      indicatorBox.setAttribute("depth", ".06");
+      indicatorBox.setAttribute("material", "color: #111827");
+      group.appendChild(indicatorBox);
+
+      const lamp = document.createElement("a-sphere");
+      lamp.setAttribute("position", "-.55 .12 .205");
+      lamp.setAttribute("radius", ".14");
+      group.appendChild(lamp);
+
+      const statusText = document.createElement("a-text");
+      statusText.setAttribute("position", ".12 .12 .205");
+      statusText.setAttribute("align", "center");
+      statusText.setAttribute("anchor", "center");
+      statusText.setAttribute("width", "1");
+      statusText.setAttribute("color", "#ffffff");
+      group.appendChild(statusText);
+
+      // Tombol panel yang dapat diklik
+      const button = document.createElement("a-box");
+      button.setAttribute("id", `target_${info.id}`);
+      button.setAttribute("class", "clickable");
+      button.setAttribute("position", "0 -.72 .16");
+      button.setAttribute("width", "1.75");
+      button.setAttribute("height", ".52");
+      button.setAttribute("depth", ".09");
+      button.setAttribute("material",
+        "color: #0284c7; emissive: #075985; emissiveIntensity: .2");
+      group.appendChild(button);
+
+      const buttonText = document.createElement("a-text");
+      buttonText.setAttribute("value", "PILIH PANEL");
+      buttonText.setAttribute("position", "0 -.72 .22");
+      buttonText.setAttribute("align", "center");
+      buttonText.setAttribute("anchor", "center");
+      buttonText.setAttribute("width", "1.55");
+      buttonText.setAttribute("color", "#ffffff");
+      buttonText.setAttribute("scale", "1.1 1.1 1.1");
+      group.appendChild(buttonText);
+
+      panelElements[info.id] = {
+        group, lamp, statusText, button, buttonText
+      };
+
+      button.addEventListener("click", () => handlePanelClick(info.id));
+
+      container.appendChild(group);
+    });
+
+    updateAllPanels();
+  }
+
+  // =========================================================
+  // INDIKATOR PANEL
+  // =========================================================
+  function setPanel(id, on) {
+    panelStates[id] = on;
+    updatePanel(id);
+  }
+
+  function updatePanel(id) {
+    const el = panelElements[id];
+    if (!el) return;
+
+    const on = panelStates[id];
+
+    el.lamp.setAttribute("material",
+      `color: ${on ? "#22c55e" : "#ef4444"};
+       emissive: ${on ? "#16a34a" : "#991b1b"};
+       emissiveIntensity: .9`);
+
+    el.statusText.setAttribute("value",
+      id === "PLN"
+        ? (on ? "PLN AVAILABLE" : "PLN OFF")
+        : (on ? "POWER ON" : "POWER OFF"));
+  }
+
+  function updateAllPanels() {
+    panelInfo.forEach(p => updatePanel(p.id));
+  }
+
+  // =========================================================
+  // PILIH SKENARIO
+  // =========================================================
+  function chooseScenario(mode) {
+    if (running) {
+      $("statusText").textContent =
+        "Training sedang berjalan. Tekan RESET dahulu.";
+      return;
+    }
+
+    selectedMode = mode;
+    $("scenarioText").textContent =
+      mode === "OFF" ? "PLN OFF — SIAP" : "PLN ON — SIAP";
+
+    $("stepText").textContent =
+      `Skenario ${mode === "OFF" ? "PLN OFF" : "PLN ON"} dipilih.\n` +
+      "Tekan MULAI TRAINING untuk memulai.";
+
+    $("statusText").textContent = "Status: Siap memulai";
+    $("statusText").style.color = "#fde68a";
+
+    $("btnOff").style.outline = mode === "OFF" ? "3px solid white" : "none";
+    $("btnOn").style.outline = mode === "ON" ? "3px solid white" : "none";
+  }
+
+  // =========================================================
+  // MULAI TRAINING DAN SIAPKAN KEADAAN AWAL
+  // =========================================================
+  function startTraining() {
+    if (!selectedMode) {
+      $("statusText").textContent = "Status: Pilih skenario dahulu";
+      $("stepText").textContent =
+        "1. Pilih PLN OFF atau PLN ON.\n" +
+        "2. Tekan MULAI TRAINING.\n" +
+        "3. Ikuti panel yang disorot.";
+      return;
+    }
+
+    currentStep = 0;
+    score = 100;
+    running = true;
+    completed = false;
+    hintMode = false;
+
+    if (selectedMode === "OFF") {
+      // Simulasi PLN padam sementara panel downstream masih ON.
+      setPanel("PLN", false);
+      setPanel("MAIN", true);
+      setPanel("VBC", true);
+      setPanel("F1", true);
+      setPanel("F2", true);
+
+      steps = [
+        {
+          panel: "PLN",
+          action: "VERIFY",
+          title: "1. Verifikasi PLN OFF",
+          text: "Pilih PLN CONTROL PANEL. Pastikan indikator sumber PLN menunjukkan OFF."
+        },
+        {
+          panel: "F1",
+          action: "OFF",
+          title: "2. Simulasi Feeder Panel 1 OFF",
+          text: "Pilih FEEDER PANEL 1 untuk simulasi mematikan MCB sesuai urutan demo."
+        },
+        {
+          panel: "F2",
+          action: "OFF",
+          title: "3. Simulasi Feeder Panel 2 OFF",
+          text: "Pilih FEEDER PANEL 2 untuk simulasi mematikan MCB."
+        },
+        {
+          panel: "VBC",
+          action: "OFF",
+          title: "4. Simulasi VBC Panel OFF",
+          text: "Pilih VBC PANEL untuk simulasi mematikan MCB."
+        },
+        {
+          panel: "MAIN",
+          action: "OFF",
+          title: "5. Simulasi Main Station OFF",
+          text: "Pilih MAIN STATION untuk menyelesaikan skenario demo PLN OFF."
+        }
+      ];
+    } else {
+      // Simulasi sumber PLN pulih dan panel downstream masih OFF.
+      setPanel("PLN", true);
+      setPanel("MAIN", false);
+      setPanel("VBC", false);
+      setPanel("F1", false);
+      setPanel("F2", false);
+
+      steps = [
+        {
+          panel: "PLN",
+          action: "VERIFY",
+          title: "1. Verifikasi PLN ON",
+          text: "Pilih PLN CONTROL PANEL. Pastikan sumber PLN menunjukkan AVAILABLE/ON."
+        },
+        {
+          panel: "MAIN",
+          action: "ON",
+          title: "2. Simulasi Main Station ON",
+          text: "Pilih MAIN STATION untuk simulasi mengaktifkan MCB."
+        },
+        {
+          panel: "VBC",
+          action: "ON",
+          title: "3. Simulasi VBC Panel ON",
+          text: "Pilih VBC PANEL untuk simulasi mengaktifkan MCB."
+        },
+        {
+          panel: "F1",
+          action: "ON",
+          title: "4. Simulasi Feeder Panel 1 ON",
+          text: "Pilih FEEDER PANEL 1 untuk simulasi mengaktifkan MCB."
+        },
+        {
+          panel: "F2",
+          action: "ON",
+          title: "5. Simulasi Feeder Panel 2 ON",
+          text: "Pilih FEEDER PANEL 2 untuk menyelesaikan skenario demo PLN ON."
+        }
+      ];
+    }
+
+    $("scenarioText").textContent =
+      selectedMode === "OFF" ? "PLN OFF" : "PLN ON";
+
+    $("statusText").textContent = "Status: Training berlangsung";
+    $("statusText").style.color = "#fde68a";
+    renderStep();
+  }
+
+  // =========================================================
+  // TAMPILKAN LANGKAH DAN SOROT PANEL TARGET
+  // =========================================================
+  function renderStep() {
+    if (completed) {
+      $("stepCount").textContent = `${steps.length} / ${steps.length}`;
+      $("stepText").textContent =
+        "TRAINING SELESAI!\nSemua langkah simulasi telah diselesaikan.";
+      $("statusText").textContent = "Status: BERHASIL";
+      $("statusText").style.color = "#86efac";
+      $("scoreText").textContent = `Skor: ${score}`;
+      clearHighlights();
+      return;
+    }
+
+    const step = steps[currentStep];
+    if (!step) return;
+
+    $("stepCount").textContent = `${currentStep + 1} / ${steps.length}`;
+    $("stepText").textContent = `${step.title}\n${step.text}`;
+    $("statusText").textContent =
+      `Status: Pilih ${panelInfo.find(p => p.id === step.panel).name}`;
+    $("statusText").style.color = "#fde68a";
+    $("scoreText").textContent = `Skor: ${score}`;
+
+    panelInfo.forEach(p => {
+      const el = panelElements[p.id];
+      const target = p.id === step.panel;
+
+      el.button.setAttribute("material",
+        target
+          ? "color: #facc15; emissive: #ca8a04; emissiveIntensity: .55"
+          : "color: #0284c7; emissive: #075985; emissiveIntensity: .2");
+
+      el.buttonText.setAttribute("value",
+        target ? "PILIH SEKARANG" : "PILIH PANEL");
+      el.buttonText.setAttribute("color", target ? "#111827" : "#ffffff");
+    });
+  }
+
+  function clearHighlights() {
+    panelInfo.forEach(p => {
+      const el = panelElements[p.id];
+      if (!el) return;
+      el.button.setAttribute("material",
+        "color: #0284c7; emissive: #075985; emissiveIntensity: .2");
+      el.buttonText.setAttribute("value", "PILIH PANEL");
+      el.buttonText.setAttribute("color", "#ffffff");
+    });
+  }
+
+  // =========================================================
+  // VALIDASI INTERAKSI
+  // =========================================================
+  function handlePanelClick(panelId) {
+    if (!running || completed) {
+      $("statusText").textContent =
+        "Status: Pilih skenario dan tekan MULAI TRAINING dahulu";
+      return;
+    }
+
+    const step = steps[currentStep];
+
+    if (panelId !== step.panel) {
+      score = Math.max(0, score - 5);
+      $("statusText").textContent =
+        "Belum tepat. Pilih panel yang disorot.";
+      $("statusText").style.color = "#fca5a5";
+      $("scoreText").textContent = `Skor: ${score}`;
+      return;
+    }
+
+    if (step.action === "VERIFY") {
+      const expectedPLN = selectedMode === "ON";
+
+      if (panelStates.PLN !== expectedPLN) {
+        score = Math.max(0, score - 10);
+        $("statusText").textContent =
+          "Status sumber PLN tidak sesuai skenario.";
+        $("scoreText").textContent = `Skor: ${score}`;
+        return;
+      }
+    } else if (step.action === "OFF") {
+      setPanel(panelId, false);
+    } else if (step.action === "ON") {
+      setPanel(panelId, true);
+    }
+
+    currentStep++;
+
+    if (currentStep >= steps.length) {
+      completed = true;
+      running = false;
+      renderStep();
+    } else {
+      renderStep();
+    }
+  }
+
+  // =========================================================
+  // RESET KE KONDISI AWAL
+  // =========================================================
+  function resetTraining() {
+    selectedMode = "";
+    steps = [];
+    currentStep = 0;
+    score = 100;
+    running = false;
+    completed = false;
+    hintMode = false;
+
+    Object.keys(panelStates).forEach(id => setPanel(id, false));
+
+    $("scenarioText").textContent = "Belum dipilih";
+    $("stepCount").textContent = "0 / 5";
+    $("stepText").textContent =
+      "Pilih skenario PLN OFF atau PLN ON, lalu tekan MULAI TRAINING.";
+    $("statusText").textContent = "Status: Menunggu training";
+    $("statusText").style.color = "#fde68a";
+    $("scoreText").textContent = "Skor: 100";
+
+    $("btnOff").style.outline = "none";
+    $("btnOn").style.outline = "none";
+
+    clearHighlights();
+  }
+
+  // =========================================================
+  // TOMBOL HUD
+  // =========================================================
+  $("btnOff").addEventListener("click", () => chooseScenario("OFF"));
+  $("btnOn").addEventListener("click", () => chooseScenario("ON"));
+  $("btnStart").addEventListener("click", startTraining);
+  $("btnReset").addEventListener("click", resetTraining);
+
+  $("btnHint").addEventListener("click", () => {
+    hintMode = !hintMode;
+
+    if (hintMode) {
+      $("stepText").textContent =
+        "PETUNJUK TRAINING\n" +
+        "1. Pilih skenario PLN OFF atau PLN ON.\n" +
+        "2. Tekan MULAI TRAINING.\n" +
+        "3. Baca instruksi di layar.\n" +
+        "4. Pilih panel yang disorot.\n" +
+        "5. Panel yang salah dipilih mengurangi skor 5 poin.";
+    } else if (running && steps[currentStep]) {
+      renderStep();
+    } else if (!running && !completed) {
+      $("stepText").textContent =
+        "Pilih skenario PLN OFF atau PLN ON, lalu tekan MULAI TRAINING.";
+    } else if (completed) {
+      renderStep();
+    }
+  });
+
+  // =========================================================
+  // CONTROLLER VR: ARAHKAN LASER DAN TEKAN TRIGGER
+  // =========================================================
+  function setupController(id) {
+    const controller = $(id);
+
+    controller.addEventListener("triggerdown", () => {
+      const ray = controller.components.raycaster;
+      if (!ray || !ray.intersectedEls.length) return;
+
+      const target = ray.intersectedEls[0];
+      if (target && target.classList.contains("clickable")) {
+        target.emit("click");
+      }
+    });
+  }
+
+  // =========================================================
+  // MODE VR
+  // =========================================================
+  const scene = document.querySelector("a-scene");
+
+  scene.addEventListener("loaded", () => {
+    createPanels();
+    setupController("rightController");
+    setupController("leftController");
+    resetTraining();
+  });
+
+  scene.addEventListener("enter-vr", () => {
+    document.body.classList.add("in-vr");
+  });
+
+  scene.addEventListener("exit-vr", () => {
+    document.body.classList.remove("in-vr");
+  });
+})();
+</script>
+</body>
+</html>
